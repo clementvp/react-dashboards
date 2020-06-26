@@ -1,3 +1,8 @@
+.deletePluginButton {
+  float: right !important;
+  margin-right: 5px !important;
+}
+
 .deletePluginButton:hover {
   cursor: pointer;
   color: red;

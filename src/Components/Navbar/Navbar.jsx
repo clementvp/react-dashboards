@@ -42,9 +42,9 @@ const Navbar = ({ selectedKey }) => {
           Create Dashboard
         </Menu.Item>
         <SubMenu
+          className={styles.subMenu}
           title="User"
           icon={<UserOutlined />}
-          style={{ float: "right" }}
         >
           <Menu.Item key="setting:1" icon={<SettingOutlined />}>
             Settings

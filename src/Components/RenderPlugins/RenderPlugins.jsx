@@ -5,12 +5,7 @@ const RenderPlugins = (plugins) => {
   const renderedPlugins = plugins.map((plugin) => (
     <div className={styles.item} key={plugin.i}>
       <span>{plugin.name}</span>
-      <span
-        style={{ float: "right", marginRight: "5px" }}
-        className={styles.deletePluginButton}
-      >
-        X
-      </span>
+      <span className={styles.deletePluginButton}>X</span>
     </div>
   ));
   return renderedPlugins;

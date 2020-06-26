@@ -5,3 +5,7 @@
   margin: 16px 16px 16px 0;
   float: left;
 }
+
+.subMenu {
+  float: right !important;
+}
