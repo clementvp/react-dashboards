@@ -1,0 +1,24 @@
+.logo {
+  width: 120px;
+  height: 31px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px 16px 16px 0;
+  float: left;
+}
+
+.siteLayout .siteLayoutBackground {
+  height: 100%;
+  background: #fff;
+}
+
+.content {
+  padding: 16px 50px;
+}
+
+.searchBar {
+  margin-bottom: 16px;
+}
+
+.editButton {
+  background-color: #bec8c8 !important;
+}

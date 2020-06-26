@@ -1,0 +1,59 @@
+.logo {
+  width: 120px;
+  height: 31px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px 16px 16px 0;
+  float: left;
+}
+
+.siteLayout .siteLayoutBackground {
+  height: 100%;
+  background: #fff;
+}
+
+.button {
+  margin-bottom: 20px;
+}
+
+.layoutContainer {
+  border: 3px dashed;
+}
+
+.addPluginButton {
+  color: #1890ff;
+}
+
+.addPluginButton:hover {
+  cursor: pointer;
+  color: black;
+}
+
+.swatchs {
+  width: 100%;
+  padding: 5px;
+  background: #fff;
+  display: inline-block;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  padding: 5px;
+  border-radius: 1px;
+  cursor: pointer;
+}
+
+.currentColorContainer {
+  width: 100%;
+  height: 18px;
+  border-radius: 2px;
+}
+
+.colorPicker {
+  position: absolute;
+  z-index: 2;
+}
+
+.colorPickerOutside {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+}

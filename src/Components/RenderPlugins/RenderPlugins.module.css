@@ -1,0 +1,15 @@
+.deletePluginButton:hover {
+  cursor: pointer;
+  color: red;
+}
+
+.item {
+  border-color: grey;
+  border: 1px solid;
+}
+.item:hover {
+  cursor: grab;
+}
+.item:active {
+  cursor: grabbing;
+}
