@@ -70,6 +70,9 @@ const DashboardEdit = () => {
   };
 
   const submitForm = (values) => {
+    console.log(plugins);
+    console.log(layout);
+
     console.log(values);
   };
 
@@ -100,6 +103,17 @@ const DashboardEdit = () => {
     const i = uuidv4();
     setLayout([...layout, { i, x: 3, y: 3, w: 3, h: 2 }]);
     setPlugins([...plugins, { i, name: "Meteo 2" }]);
+  };
+
+  const deletePlugin = (i) => {
+    const newLayout = layout.filter((element) => {
+      return element.i !== i;
+    });
+    const newPlugins = plugins.filter((element) => {
+      return element.i !== i;
+    });
+    setLayout(newLayout);
+    setPlugins(newPlugins);
   };
 
   const changeLayout = (newLayout) => {
@@ -252,7 +266,9 @@ const DashboardEdit = () => {
                 compactType={null}
                 onLayoutChange={changeLayout}
               >
-                {RenderPlugins(plugins)}
+                {RenderPlugins(plugins, (i) => {
+                  deletePlugin(i);
+                })}
               </GridLayout>
             </Col>
           </Row>
