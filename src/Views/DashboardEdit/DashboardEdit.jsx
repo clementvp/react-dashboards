@@ -28,7 +28,8 @@ import {
 import { useParams } from "react-router-dom";
 import TextArea from "antd/lib/input/TextArea";
 import { GET_DASHBOARD_DATA, GET_DASHBOARD_PLUGINS } from "../../Querys/querys";
-import { useQuery } from "@apollo/react-hooks";
+import DELETE_PLUGINS, { INSERT_PLUGINS } from "../../Mutations/mutations";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 
 const { Content } = Layout;
 
@@ -39,6 +40,8 @@ const DashboardEdit = () => {
   const [colorBg, setColorBg] = useState({ hex: "#f0f2f5" });
   const [plugins, setPlugins] = useState([]);
   const [layout, setLayout] = useState([]);
+  const [deletePlugins] = useMutation(DELETE_PLUGINS);
+  const [insertPlugins] = useMutation(INSERT_PLUGINS);
 
   const { data: dashBoardData } = useQuery(GET_DASHBOARD_DATA, {
     variables: { uuid: dashboardId },
@@ -46,7 +49,7 @@ const DashboardEdit = () => {
 
   const { data: pluginsData } = useQuery(GET_DASHBOARD_PLUGINS, {
     variables: { uuid: dashboardId },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
   });
 
   useEffect(() => {
@@ -70,10 +73,10 @@ const DashboardEdit = () => {
   };
 
   const submitForm = (values) => {
-    console.log(plugins);
-    console.log(layout);
-
-    console.log(values);
+    deletePlugins({ variables: { uuid: dashboardId } });
+    if (plugins.length !== 0) {
+      insertPlugins({ variables: { objects: plugins } });
+    }
   };
 
   const openPluginsCatalog = () => {
@@ -102,7 +105,15 @@ const DashboardEdit = () => {
   const addPlugin = () => {
     const i = uuidv4();
     setLayout([...layout, { i, x: 3, y: 3, w: 3, h: 2 }]);
-    setPlugins([...plugins, { i, name: "Meteo 2" }]);
+    setPlugins([
+      ...plugins,
+      {
+        i,
+        name: "Meteo 2",
+        url: "https://meteo.com",
+        dashboard_uuid: dashboardId,
+      },
+    ]);
   };
 
   const deletePlugin = (i) => {
@@ -127,6 +138,14 @@ const DashboardEdit = () => {
       newPlugins = plugins.filter((element) => {
         return element.i !== item.i;
       });
+      delete item.isDraggable;
+      delete item.isResizable;
+      delete item.moved;
+      delete item.static;
+      delete item.maxH;
+      delete item.maxW;
+      delete item.minH;
+      delete item.minW;
       newPlugin = Object.assign(plugin, item);
       newPlugins.push(newPlugin);
     }
@@ -214,7 +233,11 @@ const DashboardEdit = () => {
                   label="Number of columns:"
                   name="columnsNumber"
                 >
-                  <InputNumber min={12} max={24} style={{ width: "100%" }} />
+                  <InputNumber
+                    min={12}
+                    max={24}
+                    className={styles.inputNumber}
+                  />
                 </Form.Item>
                 <Form.Item label="Dashboard Background Color:">
                   <ColorPicker
@@ -249,14 +272,7 @@ const DashboardEdit = () => {
                 </Button>
               </Form>
             </Col>
-            <Col
-              span={20}
-              className={styles.layoutContainer}
-              style={{
-                paddingLeft: "0px",
-                paddingRight: "0px",
-              }}
-            >
+            <Col span={20} className={styles.layoutContainer}>
               <GridLayout
                 className="layout"
                 layout={layout}
