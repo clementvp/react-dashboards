@@ -3,8 +3,13 @@ import styles from "./Home.module.css";
 import Navbar from "../../Components/Navbar/Navbar";
 import gridStyle from "./GridStyle";
 import GET_DASHBOARDS from "../../Querys/querys";
-import { Layout, Button, Row, Col, Input, List, Card } from "antd";
-import { EyeOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Layout, Button, Row, Col, Input, List, Card, Popconfirm } from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  QuestionCircleOutlined,
+} from "@ant-design/icons";
 import { useHistory } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
 
@@ -26,6 +31,15 @@ const Home = () => {
 
   const goToEdit = (uuid) => {
     history.push(`/edit/${uuid}`);
+  };
+
+  const deleteDashboard = (uuid) => {
+    const dashboards = dashboardsList.filter((element) => {
+      return element.uuid !== uuid;
+    });
+    setDashboardsList(dashboards);
+    // delete plugins of the dashboard
+    //delete dashboard
   };
 
   return (
@@ -69,9 +83,21 @@ const Home = () => {
                         </Button>
                       </Col>
                       <Col span={8}>
-                        <Button type="danger" icon={<DeleteOutlined />}>
-                          Delete
-                        </Button>
+                        <Popconfirm
+                          title="Are you sure you want to delete this dashboard？"
+                          icon={
+                            <QuestionCircleOutlined style={{ color: "red" }} />
+                          }
+                          okText="Yes"
+                          cancelText="No"
+                          onConfirm={() => {
+                            deleteDashboard(item.uuid);
+                          }}
+                        >
+                          <Button type="danger" icon={<DeleteOutlined />}>
+                            Delete
+                          </Button>
+                        </Popconfirm>
                       </Col>
                     </Row>
                   </Card.Grid>
