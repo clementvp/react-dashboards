@@ -1,0 +1,8 @@
+.addPluginButton {
+  color: #1890ff;
+}
+
+.addPluginButton:hover {
+  cursor: pointer;
+  color: black;
+}
