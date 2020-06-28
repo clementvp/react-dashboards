@@ -10,7 +10,9 @@ const createApolloClient = (authToken) => {
         Authorization: `Bearer ${authToken}`,
       },
     }),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      addTypename: false,
+    }),
   });
 };
 

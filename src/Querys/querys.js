@@ -34,6 +34,7 @@ export const GET_DASHBOARD_PLUGINS = gql`
       w
       x
       y
+      dashboard_uuid
     }
   }
 `;

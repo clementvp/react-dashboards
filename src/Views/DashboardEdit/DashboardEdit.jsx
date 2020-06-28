@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import styles from "./DashboardEdit.module.css";
 import Navbar from "../../Components/Navbar/Navbar";
 import RenderPlugins from "../../Components/RenderPlugins/RenderPlugins";
+import PluginsCatalog from "../../Components/PluginsCatalog/PluginsCatalog";
 import ColorPicker from "../../Components/ColorPicker/ColorPicker";
 import "../../../node_modules/react-grid-layout/css/styles.css";
 import { v4 as uuidv4 } from "uuid";
-import GridLayout from "react-grid-layout";
+import RGL, { WidthProvider } from "react-grid-layout";
+import deleteUnwantedPluginKeys from "../../Utils/deleteUnwantedPluginKeys";
 import {
   Layout,
   Row,
@@ -13,25 +15,27 @@ import {
   Input,
   Form,
   Button,
-  Modal,
-  List,
-  Card,
   InputNumber,
+  notification,
 } from "antd";
 import {
   SettingOutlined,
   EditOutlined,
   SaveOutlined,
   EyeOutlined,
-  PlusOutlined,
 } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import TextArea from "antd/lib/input/TextArea";
 import { GET_DASHBOARD_DATA, GET_DASHBOARD_PLUGINS } from "../../Querys/querys";
-import DELETE_PLUGINS, { INSERT_PLUGINS } from "../../Mutations/mutations";
+import DELETE_PLUGINS, {
+  INSERT_PLUGINS,
+  UPDATE_DASHBOARD,
+} from "../../Mutations/mutations";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 
 const { Content } = Layout;
+
+const ReactGridLayout = WidthProvider(RGL);
 
 const DashboardEdit = () => {
   let { dashboardId } = useParams();
@@ -42,9 +46,11 @@ const DashboardEdit = () => {
   const [layout, setLayout] = useState([]);
   const [deletePlugins] = useMutation(DELETE_PLUGINS);
   const [insertPlugins] = useMutation(INSERT_PLUGINS);
+  const [updateDashboard] = useMutation(UPDATE_DASHBOARD);
 
   const { data: dashBoardData } = useQuery(GET_DASHBOARD_DATA, {
     variables: { uuid: dashboardId },
+    fetchPolicy: "network-only",
   });
 
   const { data: pluginsData } = useQuery(GET_DASHBOARD_PLUGINS, {
@@ -72,11 +78,31 @@ const DashboardEdit = () => {
     setColorBg(value);
   };
 
-  const submitForm = (values) => {
-    deletePlugins({ variables: { uuid: dashboardId } });
-    if (plugins.length !== 0) {
-      insertPlugins({ variables: { objects: plugins } });
-    }
+  const submitForm = async (values) => {
+    const dashboardTitle = values.dashboardTitle;
+    const description = values.dashboardDescription;
+    const columns = values.columnsNumber;
+    const colorBackground = colorBg.hex;
+    try {
+      await deletePlugins({ variables: { uuid: dashboardId } });
+      if (plugins.length > 0) {
+        await insertPlugins({ variables: { objects: plugins } });
+      }
+      await updateDashboard({
+        variables: {
+          uuid: dashboardId,
+          title: dashboardTitle,
+          description: description,
+          columns: columns,
+          colorBg: colorBackground,
+        },
+      });
+      notification.info({
+        message: `Save with success`,
+        description: "Dashboard has been saved.",
+        placement: "bottomLeft",
+      });
+    } catch (error) {}
   };
 
   const openPluginsCatalog = () => {
@@ -102,7 +128,7 @@ const DashboardEdit = () => {
     },
   ];
 
-  const addPlugin = () => {
+  const addPlugin = (pluginId) => {
     const i = uuidv4();
     setLayout([...layout, { i, x: 3, y: 3, w: 3, h: 2 }]);
     setPlugins([
@@ -138,15 +164,8 @@ const DashboardEdit = () => {
       newPlugins = plugins.filter((element) => {
         return element.i !== item.i;
       });
-      delete item.isDraggable;
-      delete item.isResizable;
-      delete item.moved;
-      delete item.static;
-      delete item.maxH;
-      delete item.maxW;
-      delete item.minH;
-      delete item.minW;
-      newPlugin = Object.assign(plugin, item);
+      const newItem = deleteUnwantedPluginKeys(item);
+      newPlugin = Object.assign(plugin, newItem);
       newPlugins.push(newPlugin);
     }
     setPlugins(newPlugins);
@@ -157,42 +176,12 @@ const DashboardEdit = () => {
       <Navbar selectedKey={"3"}></Navbar>
       <Layout className={styles.siteLayout}>
         <Content style={{ margin: "16px 50px", minHeight: "100%" }}>
-          <Modal
-            title="Plugins Catalog"
-            visible={pluginsModalVisible}
-            onCancel={closePluginsCatalog}
-            footer={null}
-            width={"80%"}
-          >
-            <List
-              grid={{ gutter: 16, column: 2 }}
-              dataSource={pluginsCatalog}
-              pagination={{
-                onChange: (page) => {
-                  console.log(page);
-                },
-                pageSize: 4,
-              }}
-              renderItem={(item) => (
-                <List.Item>
-                  <Card
-                    title={item.title}
-                    extra={
-                      <span
-                        className={styles.addPluginButton}
-                        onClick={addPlugin}
-                      >
-                        <PlusOutlined />
-                        Add
-                      </span>
-                    }
-                  >
-                    Plugin Description
-                  </Card>
-                </List.Item>
-              )}
-            />
-          </Modal>
+          <PluginsCatalog
+            pluginsCatalog={pluginsCatalog}
+            pluginsModalVisible={pluginsModalVisible}
+            closeModal={closePluginsCatalog}
+            addPlugin={addPlugin}
+          ></PluginsCatalog>
           <Row style={{ minHeight: "90vh" }} gutter="50">
             <Col span={4}>
               <Form layout="vertical" onFinish={submitForm} form={form}>
@@ -273,19 +262,18 @@ const DashboardEdit = () => {
               </Form>
             </Col>
             <Col span={20} className={styles.layoutContainer}>
-              <GridLayout
+              <ReactGridLayout
                 className="layout"
                 layout={layout}
                 cols={12}
-                rowHeight={30}
-                width={1200}
+                rowHeight={60}
                 compactType={null}
                 onLayoutChange={changeLayout}
               >
                 {RenderPlugins(plugins, (i) => {
                   deletePlugin(i);
                 })}
-              </GridLayout>
+              </ReactGridLayout>
             </Col>
           </Row>
         </Content>

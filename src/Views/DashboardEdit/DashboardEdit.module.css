@@ -25,15 +25,6 @@
   border: 3px dashed;
 }
 
-.addPluginButton {
-  color: #1890ff;
-}
-
-.addPluginButton:hover {
-  cursor: pointer;
-  color: black;
-}
-
 .swatchs {
   width: 100%;
   padding: 5px;
